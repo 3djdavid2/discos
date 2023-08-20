@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  .row
+    .col.m12
+      h1 No se ha podido hacer el pago !   
+  .row
+    .col.m12
+      h3= error.name
+  .row(style="margin-top: 80px")
+    .col.m4
+      a.btn.waves-effect.waves-dark.white.black-text(href="/") Volver al inicio

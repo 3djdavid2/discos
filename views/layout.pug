@@ -1,0 +1,18 @@
+doctype html
+html
+  head
+    title= "Transbank"
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js')
+    link(href='https://fonts.googleapis.com/icon?family=Material+Icons' rel='stylesheet')
+    link(rel='stylesheet' href='/stylesheets/highlight/atom-one-dark.css')
+    script(src='/javascripts/highlight.pack.js')
+    link(rel="shortcut icon", type="image/x-icon", href="/favicon.ico")
+  nav.pink.darken-4(style='margin-bottom: 20px')
+    .nav-wrapper.container
+      a.brand-logo(href='/')
+        img(src='/images/txcompleta.png', alt="Transbank", height=40)     
+  body
+    .container
+      block content
