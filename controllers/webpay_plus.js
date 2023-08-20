@@ -1,33 +1,29 @@
 
+import io from '../index.js'
 import pkg from 'transbank-sdk';
-const { WebpayPlus } = pkg;
-const { Options, IntegrationApiKeys, Environment, IntegrationCommerceCodes } = pkg;
 import 'dotenv/config'
-import { asyncHandler } from '../utils/async_handler.js';
 import moment from 'moment-timezone'
 moment.tz("America/Santiago").format();
+const { WebpayPlus } = pkg;
+const { Options, IntegrationApiKeys, Environment, IntegrationCommerceCodes } = pkg;
 
-import User from '../models/user.js'
-import io from '../index.js'
-
-const url_return_s = process.env.URL_RETURN_S // 's://' para prod o '://' para dev
+const url_return_s = process.env.URL_RETURN_S // 's://' para prod , '://' para dev
 
 
 //CREAR transaccion y enviar a webpay**-----------------------------------
 
-export const create = asyncHandler(async (request, response) => {
-  console.log("controller-webpay: create : comienzo del create de request.query:=> ", request.body)
-  // console.log("el req para crear transaccion trae: ", request)
+export const create = async (request, response) => {
 
+  console.log("controller-webpay: create line 17: comienzo del create de request.query:=> ", request.body)
+ 
   let fechaActual = Date.now();
 
   let buyOrder = 'O-' + moment().format('DMMyyyy-HHmmss')
   let sessionId = moment.tz(fechaActual, "America/Santiago").format();
-
   let amount = +request.body.amount
+  let returnUrl = request.protocol + url_return_s + request.get("host") + "/api/webpay_plus/commit";
   
 
-  let returnUrl = request.protocol + url_return_s + request.get("host") + "/api/webpay_plus/commit";
 
   const tx = new WebpayPlus.Transaction(new Options(IntegrationCommerceCodes.WEBPAY_PLUS, IntegrationApiKeys.WEBPAY, Environment.Integration));
   const createResponse = await tx.create(buyOrder, sessionId, amount, returnUrl);
@@ -35,8 +31,7 @@ export const create = asyncHandler(async (request, response) => {
   let token = createResponse.token;
   let url = createResponse.url;
 
-  console.log("controller-webpay: create line  42: el token webpay creado es: ", token)
-
+  console.log("controller-webpay: create line  34: el token webpay creado es: ", token)
  
 
   let viewData = {
@@ -50,9 +45,9 @@ export const create = asyncHandler(async (request, response) => {
   };
   response.status(200).json(viewData)//se reenvia al front y este crea un form automatico que tiene el token creado por tbk
 
-});
+};
 
-export const commit = asyncHandler(async (request, response) => {
+export const commit = async (request, response) => {
   console.log("webpay controller, funcion export.commit aqui, inicio, debe renderizar aviso-ok", request)
 
   //Flujos:
@@ -128,11 +123,11 @@ export const commit = asyncHandler(async (request, response) => {
   console.log("NO se hizo el pago, ya que no es respuesta '0', esto no deberia aparecer si la respuesta es 0")
   response.render("webpay_plus/commit-error");
 
-});
+};
 
 
 //todo solo ADMIN
-export const status = asyncHandler(async (request, response, next) => {
+export const status = async (request, response, next) => {
   let token = request.body.token;
 
   const statusResponse = await (new WebpayPlus.Transaction()).status(token);
@@ -153,9 +148,9 @@ export const status = asyncHandler(async (request, response, next) => {
 
   // response.status(200).json(viewData)
 
-});
+};
 
-export const refund = asyncHandler(async (request, response, next) => {
+export const refund = async (request, response, next) => {
   let { token, amount } = request.body;
 
   const refundResponse = await (new WebpayPlus.Transaction()).refund(token, amount);
@@ -176,4 +171,4 @@ export const refund = asyncHandler(async (request, response, next) => {
       "y el tiempo transacurrido será una Reversa, Anulación o Anulación parcial.",
     viewData,
   });
-});
+};
