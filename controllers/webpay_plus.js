@@ -16,7 +16,7 @@ const url_return_s = process.env.URL_RETURN_S // 's://' para prod o '://' para d
 //CREAR transaccion y enviar a webpay**-----------------------------------
 
 export const create = asyncHandler(async (request, response) => {
-  console.log("controller-webpay: create line 14: comienzo del create de request.query:=> ", request.body)
+  console.log("controller-webpay: create : comienzo del create de request.query:=> ", request.body)
   // console.log("el req para crear transaccion trae: ", request)
 
   let fechaActual = Date.now();
@@ -24,11 +24,8 @@ export const create = asyncHandler(async (request, response) => {
   let buyOrder = 'O-' + moment().format('DMMyyyy-HHmmss')
   let sessionId = moment.tz(fechaActual, "America/Santiago").format();
 
-  let socketId = request.query.skid
-  let tokenLstrg = request.query.token
-
   let amount = +request.body.amount
-  let costoenviame = +request.query.costoenviame
+  
 
   let returnUrl = request.protocol + url_return_s + request.get("host") + "/api/webpay_plus/commit";
 
@@ -40,17 +37,10 @@ export const create = asyncHandler(async (request, response) => {
 
   console.log("controller-webpay: create line  42: el token webpay creado es: ", token)
 
-  await User.update(
-    {
-      socketId: socketId,
-      token_ws: token
-    },
-    { where: { token: tokenLstrg } }
-  )
-  console.log("se agrega a USER el socketId y token_ws creados")
+ 
 
   let viewData = {
-    costoenviame,
+  
     buyOrder,
     sessionId,
     amount,
@@ -62,7 +52,7 @@ export const create = asyncHandler(async (request, response) => {
 
 });
 
-export const commit = async (request, response) => {
+export const commit = asyncHandler(async (request, response) => {
   console.log("webpay controller, funcion export.commit aqui, inicio, debe renderizar aviso-ok", request)
 
   //Flujos:
@@ -138,7 +128,7 @@ export const commit = async (request, response) => {
   console.log("NO se hizo el pago, ya que no es respuesta '0', esto no deberia aparecer si la respuesta es 0")
   response.render("webpay_plus/commit-error");
 
-}
+});
 
 
 //todo solo ADMIN
